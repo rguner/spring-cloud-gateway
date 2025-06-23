@@ -1,0 +1,54 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: spring-cloud-gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: local_route
+              uri: http://localhost:8080
+              predicates:
+                - Path=/local-test
+              filters:
+                - AddRequestHeader=My-Header-Good,Good
+                - AddRequestHeader=My-Header-Remove,Remove
+                - AddRequestHeadersIfNotPresent=My-Header-Absent:Absent
+                - AddRequestParameter=var, good
+                - AddRequestParameter=var2, remove
+                - MapRequestHeader=My-Header-Good, My-Header-Bad
+                - MapRequestHeader=My-Header-Set, My-Header-Bad
+                - SetRequestHeader=My-Header-Set, Set
+                - RemoveRequestHeader=My-Header-Remove
+                - RemoveRequestParameter=var2
+            - id: httpbin
+              uri: http://httpbin.org
+              predicates:
+                - Path=/httpbin
+              filters:
+                - AddRequestHeader=My-Header-Good,Good
+                - AddRequestHeader=My-Header-Remove,Remove
+                - AddRequestHeadersIfNotPresent=My-Header-Absent:Absent
+                - AddRequestParameter=var, good
+                - AddRequestParameter=var2, remove
+                - MapRequestHeader=My-Header-Good, My-Header-Bad
+                - MapRequestHeader=My-Header-Set, My-Header-Bad
+                - SetRequestHeader=My-Header-Set, Set
+                - RemoveRequestHeader=My-Header-Remove
+                - RemoveRequestParameter=var2
+            - id: invalid_route
+              uri: http://localhost:7000
+              predicates:
+                - Path=/invalid
+            - id: baeldung_route
+              uri: http://baeldung.com
+              predicates:
+                - Path=/baeldung/
+management:
+  endpoints:
+    web:
+        exposure:
+            include: "*"
