@@ -4,10 +4,24 @@ server:
 spring:
   application:
     name: spring-cloud-gateway
+  reactor:
+    debug-agent:
+      enabled: true
   cloud:
     gateway:
       server:
         webflux:
+          httpclient:
+            max-header-size: ${CLOUD_GW_HTTPCLIENT_HEADER_SIZE:16384}
+            max-initial-line-length: ${CLOUD_GW_HTTPCLIENT_HEADER_SIZE:16384}
+            #pool:
+            #  name: gateway-pool
+            #  type: FIXED
+            #  max-connections: 1000
+            #  acquire-timeout: 45000
+            #  max-idle-time: 30s
+            #  max-life-time: 120s
+            #wiretap: false
           routes:
             - id: local_route
               uri: http://localhost:8080
@@ -24,6 +38,12 @@ spring:
                 - SetRequestHeader=My-Header-Set, Set
                 - RemoveRequestHeader=My-Header-Remove
                 - RemoveRequestParameter=var2
+            - id: hello2
+              uri: http://localhost:8080
+              predicates:
+                - Path=/v1/hello2
+              filters:
+                - AddRequestHeader=My-Header-Good,Good
             - id: httpbin
               uri: http://httpbin.org
               predicates:
@@ -89,8 +109,22 @@ spring:
                 - name: RequestSize
                   args:
                     maxSize: 5000000
+
+
 management:
   endpoints:
     web:
       exposure:
         include: "*"
+
+
+logging:
+    level:
+        org.springframework.web: DEBUG
+        org.springframework.cloud.gateway: DEBUG
+        reactor.netty.http.client.HttpClient: DEBUG
+        reactor.netty.resources.PooledConnectionProvider: DEBUG
+        io.netty: WARN
+        io.netty.resolver.dns.DnsAddressResolverGroup: INFO
+        org.apache.http: WARN
+        org.apache.http.wire: ERROR

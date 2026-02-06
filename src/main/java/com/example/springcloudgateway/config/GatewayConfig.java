@@ -14,11 +14,12 @@ public class GatewayConfig {
     @Bean
     public RouteLocator routes(RouteLocatorBuilder builder) {
         return builder.routes()
-                .route("modify_request_body", r -> r.path("/hello/**")
+                .route("modify_request_body", r -> r.path("/v1/hello/**")
                         .filters(f -> f.modifyRequestBody(
                                 String.class, Hello.class, MediaType.APPLICATION_JSON_VALUE,
                                 (exchange, s) -> Mono.just(new Hello("title", s))))
-                        .uri("http://localhost:8080"))
+                        .uri("http://localhost:8080")
+                )
                 .build();
     }
 
